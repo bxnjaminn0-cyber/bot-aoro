@@ -56,16 +56,19 @@ def send_price(message):
     else:
         res = "⚠️ No se pudo obtener la cotización en vivo."
     bot.reply_to(message, res, parse_mode="Markdown")
-
-@bot.message_handler(func=lambda message: True)
+    @bot.message_handler(func=lambda message: True)
 def responder_ia(message):
     try:
-        prompt = f"{SYSTEM_PROMPT}\n\n{message.text}"
-        response = model.generate_content(prompt)
+        # Llamada moderna a Gemini 2.0 Flash
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=f"{SYSTEM_PROMPT}\n\n{message.text}"
+        )
         bot.reply_to(message, response.text)
     except Exception as e:
         print(f"ERROR GEMINI DETALLADO: {e}")
         bot.reply_to(message, "⚠️ Ocurrió un inconveniente al consultar con el módulo de IA. Intentalo de nuevo.")
+
 
 
 if __name__ == "__main__":
