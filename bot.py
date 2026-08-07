@@ -1,6 +1,6 @@
 import os
 import threading
-from flask import Flask
+from flask import Flask, request
 import telebot
 import requests
 from google import genai
@@ -45,7 +45,7 @@ def obtener_precios_crypto():
 def send_welcome(message):
     bot.reply_to(message, "¡Hola! Soy el Agente IA de AORO.")
 
-@bot.message_handler(commands=['precio', 'oro'])
+@bot.message_handler(func=lambda message: message.text in ['📊 Cotización Oro / RWA', '/precio', '/oro'])
 def send_price(message):
     paxg, xaut = obtener_precios_crypto()
     if paxg and xaut:
@@ -57,10 +57,10 @@ def send_price(message):
 @bot.message_handler(func=lambda message: True)
 def responder_ia(message):
     try:
-        prompt = f"{SYSTEM_PROMPT}\n\n{message.text}"
+        prompt_text = f"{SYSTEM_PROMPT}\n\n{message.text}"
         response = client.models.generate_content(
             model='gemini-2.0-flash',
-            contents=prompt
+            contents=prompt_text
         )
         bot.reply_to(message, response.text)
     except Exception as e:
