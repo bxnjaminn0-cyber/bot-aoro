@@ -72,3 +72,4 @@ if __name__ == "__main__":
     threading.Thread(target=run_flask, daemon=True).start()
     print(">>> Agente IA AORO v2.0 activo...")
     bot.infinity_polling()
+
