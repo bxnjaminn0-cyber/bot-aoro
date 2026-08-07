@@ -1,19 +1,29 @@
 import os
+import threading
+from flask import Flask
 import telebot
 import requests
 import google.generativeai as genai
 
-# Tokens (se leen desde las variables de entorno de Render)
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "TU_TELEGRAM_TOKEN_AQUI")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "TU_GEMINI_API_KEY_AQUI")
+# Servidor web liviano para el plan gratuito de Render
+app = Flask(__name__)
 
-# Configuración del modelo Gemini
+@app.route('/')
+def home():
+    return "Bot IA AORO Activo", 200
+
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
-# Instrucciones del sistema para la IA
 SYSTEM_PROMPT = """
 Sos el Agente Inteligente Oficial del ecosistema AORO.
 Tus funciones son:
@@ -35,7 +45,7 @@ def obtener_precios_crypto():
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-        bot.reply_to(message, "¡Hola! Soy el Agente IA de AORO. Podés preguntarme cualquier duda sobre el ecosistema, cotizaciones RWA o soporte de billeteras.")
+    bot.reply_to(message, "¡Hola! Soy el Agente IA de AORO. Podés preguntarme cualquier duda sobre el ecosistema, cotizaciones RWA o soporte de billeteras.")
 
 @bot.message_handler(commands=['precio', 'oro'])
 def send_price(message):
@@ -55,5 +65,7 @@ def responder_con_ia(message):
     except Exception:
         bot.reply_to(message, "⚠️ Ocurrió un inconveniente al consultar con el módulo de IA. Intentalo de nuevo.")
 
-print(">>> Agente IA AORO v2.0 activo...")
-bot.infinity_polling()
+if __name__ == "__main__":
+    threading.Thread(target=run_flask, daemon=True).start()
+    print(">>> Agente IA AORO v2.0 activo...")
+    bot.infinity_polling()
