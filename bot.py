@@ -18,7 +18,8 @@ def run_flask():
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 
-TOKEN_TELEGRAM = os.environ.get("TELEGRAM_TOKEN")
+# Token fijo para evitar errores de variables en Render
+TOKEN_TELEGRAM = "8818956914:AAFuVxKM6gYv33v44_fD_CuTGR_eC3K16Ok"
 
 bot = telebot.TeleBot(TOKEN_TELEGRAM)
 
